@@ -12,6 +12,7 @@ using namespace std;
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+#include <pcl/filters/passthrough.h>
 
 int main(int argc, char **argv) {
     vector<cv::Mat> colorImgs, depthImgs;    // 彩色图和深度图
@@ -91,10 +92,26 @@ int main(int argc, char **argv) {
 
     pointCloud->is_dense = false;
     cout << "点云共有" << pointCloud->size() << "个点." << endl;
+    /* 统计滤波
+    pcl::StatisticalOutlierRemoval<PointT> Static;
+Static.setMeanK(50);//邻居点数目k
+Static.setStddevMulThresh(2.2);//比例系数α
+Static.setInputCloud(pointCloud);
+Static.filter(*pointCloud);
+*/
+    /*
+    pcl::PassThrough<pcl::PointXYZ> pass;
+    pass.setInputCloud(pointCloud);
+    pass.setFilterFieldName("z");
+    pass.setFilterLimits(0,1.0);
+    pass.filter(*pointCloud);
+    */
 
+    /// 体素滤波
+    
     // voxel filter 
     pcl::VoxelGrid<PointT> voxel_filter;
-    double resolution = 0.03;
+    double resolution = 0.01;
     voxel_filter.setLeafSize(resolution, resolution, resolution);       // resolution
     PointCloud::Ptr tmp(new PointCloud);
     voxel_filter.setInputCloud(pointCloud);
